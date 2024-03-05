@@ -1,0 +1,2 @@
+from fz_search_reranker.models.model import MyNeuralNet
+from fz_search_reranker.predict_model import predict
