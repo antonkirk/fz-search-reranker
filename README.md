@@ -24,8 +24,6 @@ The directory structure of the project looks like this:
 │
 ├── models               <- Trained and serialized models, model predictions, or model summaries
 │
-├── notebooks            <- Jupyter notebooks.
-│
 ├── pyproject.toml       <- Project configuration file
 │
 ├── reports              <- Generated analysis as HTML, PDF, LaTeX, etc.
@@ -52,8 +50,7 @@ The directory structure of the project looks like this:
 │   ├── visualization    <- Scripts to create exploratory and results oriented visualizations
 │   │   ├── __init__.py
 │   │   └── visualize.py
-│   ├── train_model.py   <- script for training the model
-│   └── predict_model.py <- script for predicting from a model
+│   └── train_model.py   <- script for training the model
 │
 └── LICENSE              <- Open-source license if one is chosen
 ```
