@@ -6,9 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "fz_search_reranker"
 version = "0.0.1"
 description = "A short description of the project."
-authors = [
-  { name = "Anton Kaae Kirk", email = "your@email.com" },
-]
+authors = [{ name = "Anton Kaae Kirk", email = "s184191@dtu.dk" }]
 
 readme = "README.md"
 requires-python = ">=3.11"
@@ -18,10 +16,10 @@ dynamic = ["dependencies", "optional-dependencies"]
 packages = ["fz_search_reranker"]
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools.dynamic.optional-dependencies]
-dev = {file = ['requirements_dev.txt']}
+dev = { file = ['requirements_dev.txt'] }
 
 [tool.ruff]
 line-length = 120
