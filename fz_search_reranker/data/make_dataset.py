@@ -1,13 +1,16 @@
 import json
 import pickle
+from pathlib import Path
 from typing import List
 
+import hydra
 from datasets import load_dataset
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
+from omegaconf import DictConfig
 
 
-def save_data(chunks, examples):
+def save_data(chunks: List[Document], examples: List[Document]):
     with open("data/processed/chunks.pkl", "wb") as f:
         pickle.dump(chunks, f)
     with open("data/processed/example_queries.pkl", "wb") as f:
@@ -25,7 +28,7 @@ def load_data():
     return chunks, example_queries
 
 
-def make_example_queries(chunks):
+def make_example_queries(chunks: List[Document]):
     dataset = load_dataset("findzebra/queries")
     dataset_train = dataset["train"]
 
@@ -67,12 +70,12 @@ def make_chunks(chunk_size: int, chunk_overlap: int, num_examples: int = 0) -> L
 
 
 def make_batch_requests(
-    chunks,
-    n_requests,
-    example_prompt,
-    system_prompt,
-    user_prompt_template,
-    file_name="data/processed/batch_tasks_queries.jsonl",
+    chunks: List[Document],
+    n_requests: int,
+    example_prompt: str,
+    system_prompt: str,
+    user_prompt_template: str,
+    file_path: str = "data/processed/batch_tasks_queries.jsonl",
 ):
     """"""
     tasks = []
@@ -100,7 +103,7 @@ def make_batch_requests(
 
             tasks.append(task)
 
-    with open(file_name, "w") as f:
+    with open(file_path, "w") as f:
         for obj in tasks:
             f.write(json.dumps(obj))
             f.write("\n")
@@ -112,7 +115,7 @@ def make_requests(
     system_prompt: str,
     user_prompt_template: str,
     n_requests: int = 0,
-    file_name: str = "data/processed/api_requests.jsonl",
+    file_path: str = "data/processed/api_requests.jsonl",
 ):
     if n_requests == 0:
         n_requests = len(chunks)
@@ -132,25 +135,52 @@ def make_requests(
                     {"role": "user", "content": example_prompt},
                     {"role": "user", "content": description},
                 ],
+                "metadata": {"row_id": index},
             }
             requests.append(request)
 
-    with open(file_name, "w") as f:
+    with open(file_path, "w") as f:
         for obj in requests:
             f.write(json.dumps(obj))
             f.write("\n")
 
 
-def make_dataset(load_from_disk=False, save_to_disk=False):
-    if load_from_disk:
+def generate_queries_with_local_model(model: str, device: str):
+    pass
+
+
+def extract_responses_from_jsonl(chunks, file_path):
+    queries = []
+    with open(file_path, "r") as f:
+        for line in f:
+            response = json.loads(line)
+            query = response[1]["choices"][0]["message"]["content"]
+            row_id = response[2]["row_id"]
+            queries.append((query, row_id))
+    queries.sort(key=lambda x: x[1])
+
+    dataset = [{"query": q[0], "chunk": c.page_content} for q, c in zip(queries, chunks)]
+
+    data = {"version": "0.0.2", "data": dataset}
+
+    # Save dataset as json
+    with open("data/processed/dataset_v0.0.2.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+
+
+@hydra.main(version_base=None, config_path="../configs", config_name="config")
+def make_dataset(cfg: DictConfig):
+    # print(OmegaConf.to_yaml(cfg))
+
+    if cfg.data.load_from_disk:
         chunks, examples = load_data()
     else:
         chunks = make_chunks(chunk_size=1000, chunk_overlap=100)
         examples = make_example_queries(chunks)
-        if save_to_disk:
+        if cfg.data.save_to_disk:
             save_data(chunks, examples)
 
-    print(f"Number of chunks: {len(chunks)}")
+    # print(f"Number of chunks: {len(chunks)}")
 
     # Pick the first chunk from every document by title
     chunks_dict = {}
@@ -159,39 +189,22 @@ def make_dataset(load_from_disk=False, save_to_disk=False):
             chunks_dict[c.metadata["title"]] = c
     chunks = list(chunks_dict.values())
 
-    system_prompt = (
-        "You are a medical professional generating queries relevant to a patient's symptoms.\n\n"
-        "You are given an example of a query and a relevant chunk of text from a medical document.\n\n"
-        "Generate a comma-separated query of patient symptoms that is relevant to the given chunk."
-    )
+    # example_prompt = cfg.data.user_prompt_template.format(
+    #     chunk_title=examples[0]["chunk_title"],
+    #     chunk_content=examples[0]["chunk_content"],
+    #     user_query=examples[0]["query"],
+    # )
 
-    user_prompt_template = "Title: {chunk_title}\nChunk: {chunk_content}\nUser query: {user_query}"
-
-    example_prompt = user_prompt_template.format(
-        chunk_title=examples[0]["chunk_title"],
-        chunk_content=examples[0]["chunk_content"],
-        user_query=examples[0]["query"],
-    )
-
-    make_requests(chunks, example_prompt, system_prompt, user_prompt_template)
-
-    # prompt = FewShotPromptTemplate(
-    #     examples=examples,
+    # make_requests(
+    #     chunks=chunks,
+    #     n_requests=cfg.data.n_requests,
     #     example_prompt=example_prompt,
-    #     prefix=prefix,
-    #     suffix="Title:{title}\n\nChunk:{chunk}\n\nUser query:",
-    #     input_variables=['title','chunk']
-    # )
+    #     system_prompt=cfg.data.system_prompt,
+    #     user_prompt_template=cfg.data.user_prompt_template,
+    #     file_path=Path(f"{cfg.sys.work_dir}/{cfg.data.paths.requests}")
+    #     )
 
-    # llm = ChatOpenAI(
-    #     model_name="gpt-3.5-turbo",
-    #     temperature=0.0,
-    #     api_key=openai_api_key
-    # )
-
-    # # # Print 10 examples of title and chunks
-    # # for title, chunks in list(chunks_dict.items())[:10]:
-    # #     print(prompt.format(title=title, chunks=chunks))
+    extract_responses_from_jsonl(chunks, Path(f"{cfg.sys.work_dir}/{cfg.data.paths.requests_results}"))
 
     # num_examples = 5000
     # queries = []
@@ -206,19 +219,9 @@ def make_dataset(load_from_disk=False, save_to_disk=False):
 
     # print(f"Total time taken: {time.time() - start_time}")
 
-    # dataset = [{'query': q, 'chunk': c.page_content} for c, q in zip(chunks, queries)]
-    # data = {
-    #     'version': '0.0.1',
-    #     'data': dataset
-    # }
-
-    # # Save dataset as json
-    # with open('data/processed/dataset.json', 'w', encoding='utf-8') as f:
-    #     json.dump(data, f, indent=4)
-
 
 if __name__ == "__main__":
-    make_dataset(load_from_disk=True, save_to_disk=False)
+    make_dataset()
 
     # dataset = load_dataset('findzebra/corpus')
     # dataset_train = dataset['train']

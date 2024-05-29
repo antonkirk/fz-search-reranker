@@ -1,0 +1,11 @@
+dataset_version: 0.0.2
+model_version: 0.0.1
+params:
+  test_size: 0.2
+  num_epochs: 1
+  warmup_pct: 0.1
+paths:
+  data: ${sys.work_dir}/data/processed/dataset_v${..dataset_version}.json
+  model_name: msmarco-distilbert-base-v4
+  checkpoint: ${sys.work_dir}/models/${.model_name}/${..model_version}/checkpoints/
+  output: ${sys.work_dir}/models/${.model_name}/${..model_version}/model/
