@@ -5,7 +5,7 @@ params:
   num_epochs: 1
   warmup_pct: 0.1
 paths:
-  data: ${sys.work_dir}/data/processed/dataset_v${..dataset_version}.json
+  data: ${sys.cache_dir}/dataset_v${..dataset_version}.json
   model_name: msmarco-distilbert-base-v4
-  checkpoint: ${sys.work_dir}/models/${.model_name}/${..model_version}/checkpoints/
-  output: ${sys.work_dir}/models/${.model_name}/${..model_version}/model/
+  checkpoint: ${sys.cache_dir}/models/${.model_name}/${..model_version}/checkpoints/
+  output: ${sys.cache_dir}/models/${.model_name}/${..model_version}/model/

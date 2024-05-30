@@ -44,6 +44,14 @@ clean:
 data:
 	python $(PROJECT_NAME)/data/make_dataset.py
 
+## Train model
+train_local:
+	python $(PROJECT_NAME)/train_model.py sys=local
+
+## Train model on GPU cluster
+train_titan:
+	python $(PROJECT_NAME)/train_model sys=titan
+
 #################################################################################
 # Documentation RULES                                                           #
 #################################################################################
