@@ -1,0 +1,13 @@
+load_from_disk: True
+save_to_disk: False
+chunk_size: 1000
+chunk_overlap: 100
+n_requests: 0
+paths:
+  requests: data/processed/api_requests.jsonl
+  requests_results: data/processed/api_requests_results.jsonl
+system_prompt: |-
+        You are a medical professional generating queries relevant to a patient's symptoms.
+        You are given an example of a query and a relevant chunk of text from a medical document.
+        Generate a comma-separated query of patient symptoms that is relevant to the given chunk.
+user_prompt_template: "Title: {chunk_title}\nChunk: {chunk_content}\nUser query: {user_query}"
