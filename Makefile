@@ -50,7 +50,7 @@ train_local:
 
 ## Train model on GPU cluster
 train_titan:
-	python $(PROJECT_NAME)/train_model sys=titan
+	python $(PROJECT_NAME)/train_model.py sys=titan
 
 #################################################################################
 # Documentation RULES                                                           #
