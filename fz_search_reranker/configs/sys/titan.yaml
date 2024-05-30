@@ -1,2 +1,2 @@
-cache_dir: /scratch/${whoami:}/cache/
-work_dir: /scratch/${whoami:}/fz-openqa/
+cache_dir: /scratch/${env:USER}/cache/
+work_dir: /scratch/${env:USER}/fz-openqa/
