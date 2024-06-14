@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --gres=gpu
-#SBATCH --mail-user=
+#SBATCH --mail-user=s184191@dtu.dk
 #SBATCH --mail-type=END,FAIL
 #SBATCH --partition=titans
 #SBATCH --export=ALL
