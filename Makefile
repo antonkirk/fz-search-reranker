@@ -44,6 +44,9 @@ clean:
 data:
 	python $(PROJECT_NAME)/data/make_dataset.py
 
+data_local:
+	python $(PROJECT_NAME)/data/make_dataset_local_model.py
+
 ## Train model
 train_local:
 	python $(PROJECT_NAME)/train_model.py sys=local

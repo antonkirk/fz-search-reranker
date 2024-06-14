@@ -23,7 +23,7 @@ module load CUDA/12.1
 nvidia-smi
 
 # Run your training script
-make train_titan
+make data_local
 
 # Deactivate virtual environment if activated
 # deactivate
