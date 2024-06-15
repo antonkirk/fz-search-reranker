@@ -1,15 +1,13 @@
 import torch
-import transformers
+from transformers import pipeline
 
 
-def generate_queries_with_local_model(model: str, device: str):
-    model_id = "aaditya/OpenBioLLM-Llama3-8B"
-
-    pipeline = transformers.pipeline(
+def generate_queries_with_local_model(model_id: str, device: str):
+    pipe = pipeline(
         "text-generation",
         model=model_id,
         model_kwargs={"torch_dtype": torch.bfloat16},
-        device="auto",
+        device=device,
     )
 
     messages = [
@@ -20,14 +18,14 @@ def generate_queries_with_local_model(model: str, device: str):
         {"role": "user", "content": "Hi there, can you speak like a pirate?"},
     ]
 
-    terminators = [pipeline.tokenizer.eos_token_id, pipeline.tokenizer.convert_tokens_to_ids("<|eot_id|>")]
+    terminators = [pipe.tokenizer.eos_token_id, pipe.tokenizer.convert_tokens_to_ids("<|eot_id|>")]
 
-    outputs = pipeline(
+    outputs = pipe(
         messages,
         max_new_tokens=256,
         eos_token_id=terminators,
         do_sample=True,
-        temperature=0.0,
+        temperature=0.6,
         top_p=0.9,
     )
 
@@ -35,4 +33,4 @@ def generate_queries_with_local_model(model: str, device: str):
 
 
 if __name__ == "__main__":
-    generate_queries_with_local_model("aaditya/OpenBioLLM-Llama3-8B-GGUF", "cuda")
+    generate_queries_with_local_model(model_id="aaditya/OpenBioLLM-Llama3-8B", device="cuda")
