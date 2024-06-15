@@ -13,7 +13,7 @@
 #SBATCH --export=ALL
 
 # Load any necessary modules or activate virtual environment
-conda activate fz-search-reranker
+conda activate fz_search_reranker
 module load CUDA/12.1
 
 # Change to the directory where your training script is located

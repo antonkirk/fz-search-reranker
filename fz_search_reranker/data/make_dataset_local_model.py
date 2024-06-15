@@ -17,15 +17,13 @@ def generate_queries_with_local_model(model: str, device: str):
             "role": "system",
             "content": "You are an expert and experienced from the healthcare and biomedical domain with extensive medical knowledge and practical experience. Your name is OpenBioLLM, and you were developed by Saama AI Labs. who's willing to help answer the user's query with explanation. In your explanation, leverage your deep medical expertise such as relevant anatomical structures, physiological processes, diagnostic criteria, treatment guidelines, or other pertinent medical concepts. Use precise medical terminology while still aiming to make the explanation clear and accessible to a general audience.",
         },
-        {"role": "user", "content": "How can i split a 3mg or 4mg waefin pill so i can get a 2.5mg pill?"},
+        {"role": "user", "content": "Hi there, can you speak like a pirate?"},
     ]
-
-    prompt = pipeline.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
     terminators = [pipeline.tokenizer.eos_token_id, pipeline.tokenizer.convert_tokens_to_ids("<|eot_id|>")]
 
     outputs = pipeline(
-        prompt,
+        messages,
         max_new_tokens=256,
         eos_token_id=terminators,
         do_sample=True,
@@ -33,7 +31,7 @@ def generate_queries_with_local_model(model: str, device: str):
         top_p=0.9,
     )
 
-    print(outputs[0]["generated_text"][len(prompt) :])
+    print(outputs[0]["generated_text"][-1]["content"])
 
 
 if __name__ == "__main__":

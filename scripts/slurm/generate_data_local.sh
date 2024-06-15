@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH --job-name=train_model
-#SBATCH --output=train_model_result-%J.out
+#SBATCH --output=generate_data_result-%J.out
 #SBATCH --nodes=1
-#SBATCH --time=02:00:00
+#SBATCH --time=00:30:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --gres=gpu
@@ -13,7 +13,7 @@
 #SBATCH --export=ALL
 
 # Load any necessary modules or activate virtual environment
-conda activate fz-search-reranker
+conda activate fz_search_reranker
 module load CUDA/12.1
 
 # Change to the directory where your training script is located
