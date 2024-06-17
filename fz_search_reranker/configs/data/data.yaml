@@ -6,6 +6,10 @@ n_requests: 0
 paths:
   requests: data/processed/api_requests.jsonl
   requests_results: data/processed/api_requests_results.jsonl
+  model_name: "aaditya/OpenBioLLM-Llama3-8B"
+  chunks: ${sys.cache_dir}/chunks.pkl
+  example_queries: ${sys.cache_dir}/example_queries.pkl
+  output_local_model: ${sys.cache_dir}/local_model_dataset_v0.0.1.jsonl
 system_prompt: |-
         You are a medical professional generating queries relevant to a patient's symptoms.
         You are given an example of a query and a relevant chunk of text from a medical document.

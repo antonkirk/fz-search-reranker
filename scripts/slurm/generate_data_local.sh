@@ -6,7 +6,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu
+#SBATCH --gres=gpu:Ampere:1
 #SBATCH --mail-user=
 #SBATCH --mail-type=END,FAIL
 #SBATCH --partition=titans
@@ -22,8 +22,8 @@ module load CUDA/12.1
 # Check CUDA version
 nvidia-smi
 
-# Run your training script
-make data_local
+# Run data generation script
+make data_local_model
 
 # Deactivate virtual environment if activated
 # deactivate
