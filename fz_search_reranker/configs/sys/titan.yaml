@@ -1,2 +1,3 @@
-cache_dir: /scratch/${env:USER}/cache/
-work_dir: /scratch/${env:USER}/fz-openqa/
+cache_dir: /scratch/${USER}/cache/
+work_dir: /scratch/${USER}/fz-openqa/
+device: cuda

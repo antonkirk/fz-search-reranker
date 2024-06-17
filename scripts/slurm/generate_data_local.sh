@@ -22,8 +22,8 @@ module load CUDA/12.1
 # Check CUDA version
 nvidia-smi
 
-# Run your training script
-make data_local
+# Run data generation script
+make data_local_model
 
 # Deactivate virtual environment if activated
 # deactivate
