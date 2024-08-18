@@ -1,0 +1,25 @@
+model_name: gpt-4o-mini
+
+prompts:
+  system_prompt: |-
+          You are a medical professional generating search queries based on a patient's symptoms.
+          You are given an example of a search query and a relevant chunk of text from a medical document.
+          Generate exactly four different lines of search queries of patient symptoms that are relevant to the input chunk.
+          Each line should include one or more relevant symptoms as keyword(s). Keywords should be comma-separated.
+          Answer only with the search queries.
+  user_prompt_template: "Title: {chunk_title}\nChunk: {chunk_content}\nUser queries: {user_queries}"
+  
+  example:
+    chunk_title: "MELAS syndrome"
+    chunk_content: |-
+          Mitochondrial myopathy, encephalomyopathy, lactic acidosis, and stroke-like episodes
+          Basal ganglia calcification, cerebellar atrophy, increased lactate; a CT image of a person diagnosed with MELAS
+          Specialty: Sex
+          Frequency: 1 in 4000
+          
+          Mitochondrial encephalopathy, lactic acidosis, and stroke-like episodes (MELAS) is one of the family of mitochondrial cytopathies, which also include MERRF, and Leber's hereditary optic neuropathy. It was first characterized under this name in 1984. A feature of these diseases is that they are caused by defects in the mitochondrial genome which is inherited purely from the female parent",
+    user_queries: |-
+          seizure, confusion, dysphasia, T2 lesions
+          Mitochondrial myopathy, encephalomyopathy, lactic acidosis, stroke-like episodes
+          Basal ganglia calcification, cerebellar atrophy, increased lactate, mitochondrial cytopathies
+          MELAS syndrome, mitochondrial genome defects, maternal inheritance, Leber's hereditary optic neuropathy

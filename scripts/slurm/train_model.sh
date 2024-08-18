@@ -3,17 +3,15 @@
 #SBATCH --job-name=train_model
 #SBATCH --output=train_model_result-%J.out
 #SBATCH --nodes=1
-#SBATCH --time=02:00:00
+#SBATCH --time=16:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu
-#SBATCH --mail-user=s184191@dtu.dk
-#SBATCH --mail-type=END,FAIL
+#SBATCH --gres=gpu:Ampere:4
 #SBATCH --partition=titans
 #SBATCH --export=ALL
 
 # Load any necessary modules or activate virtual environment
-conda activate fz_search_reranker
+# conda activate fz_search_reranker
 module load CUDA/12.1
 
 # Change to the directory where your training script is located
@@ -23,7 +21,8 @@ module load CUDA/12.1
 nvidia-smi
 
 # Run your training script
-make train_titan
+# python fz_search_reranker/train_model.py dataset=llama3_openbiollm_synthetic
+accelerate launch --multi_gpu fz_search_reranker/train_model.py dataset=combined_synthetic
 
 # Deactivate virtual environment if activated
 # deactivate

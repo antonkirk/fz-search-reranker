@@ -1,0 +1,7 @@
+model_name: Meta-Llama-3-8B-Instruct
+model_dir: meta-llama/${.model_name}
+chat_template: |-
+    {{ bos_token }}
+    {% for message in messages %}
+        {{ '<|start_header_id|>' + message['role'] + '<|end_header_id|>\n\n' + message['content'] | trim + '<|eot_id|>' }}
+    {% endfor %}

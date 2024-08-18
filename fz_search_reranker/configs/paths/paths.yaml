@@ -1,0 +1,13 @@
+data_dir: ${sys.base_dir}/data
+models_dir: ${sys.base_dir}/models
+index_dir: ${sys.base_dir}/index
+eval_dir: ${sys.base_dir}/eval
+
+dataset: ${dataset.path}
+dataset_unprocessed: ${dataset.path_unprocessed}
+requests: ${.data_dir}/api_requests.jsonl
+requests_results: ${.data_dir}/api_requests_results.jsonl
+chunks: ${.data_dir}/chunks.pkl
+example_queries: ${.data_dir}/example_queries.pkl
+
+model_output_dir: ${.model_dir}/${model.model_name}/

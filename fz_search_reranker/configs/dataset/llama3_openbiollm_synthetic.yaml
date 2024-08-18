@@ -1,0 +1,3 @@
+name: llama3-openbiollm-synthetic
+path: ${paths.data_dir}/llama3-openbiollm-8b-dare-ties-70-40_synthetic_dataset.jsonl
+path_unprocessed: ${paths.data_dir}/unprocessed/llama3-openbiollm-8b-dare-ties-70-40_synthetic_dataset.jsonl

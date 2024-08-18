@@ -1,0 +1,10 @@
+defaults:
+  - dataset: findzebra
+
+whoosh_index_dir: ${paths.index_dir}/whoosh
+use_whoosh: false
+use_faiss: false
+use_hybrid: false
+save_metrics: false
+ks: [1, 3, 5, 10, 20, 50, 100, 200]
+metrics_output_path: ${paths.eval_dir}/${model.model_name}_${.dataset.name}_eval.csv

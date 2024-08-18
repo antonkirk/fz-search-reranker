@@ -1,0 +1,11 @@
+# @package _global_
+defaults:
+  - override /model: llama3_openbiollm_merged_70_40
+  - override /prompts: llama3_instruct
+  
+data:
+  seed: 42
+  n_requests: 20
+  temperature: 0.4
+  clean_output: false
+  save_queries: false

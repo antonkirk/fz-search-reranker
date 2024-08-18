@@ -1,0 +1,2 @@
+name: ada_dx
+path: ${paths.data_dir}/ada_dx_eval.jsonl

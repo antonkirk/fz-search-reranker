@@ -1,0 +1,7 @@
+# @package _global_
+eval:
+  metrics_output_path: ${paths.eval_dir}/${eval.dataset}_whoosh_eval.csv
+  use_whoosh: true
+  use_faiss: false
+  use_hybrid: false
+  save_metrics: true

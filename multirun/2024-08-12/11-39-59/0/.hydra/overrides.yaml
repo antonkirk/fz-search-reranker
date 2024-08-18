@@ -1,0 +1,3 @@
+- sys=titan
+- model=mpnet_base
+- eval/dataset=findzebra

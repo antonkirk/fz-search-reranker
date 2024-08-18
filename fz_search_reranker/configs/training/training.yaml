@@ -1,11 +1,12 @@
-dataset_version: 0.0.2
-model_version: 0.0.1
+# model_version: 0.0.1
+model_name: multi-qa-mpnet-base-dot-v1
+finetuned_name: retrieval-mpnet-dot-finetuned-${dataset.name}
+checkpoint_dir: ${paths.models_dir}/${.finetuned_name}/checkpoints/
+output_dir: ${paths.models_dir}/${.finetuned_name}/model/
 params:
   test_size: 0.2
-  num_epochs: 1
-  warmup_pct: 0.1
-paths:
-  data: ${sys.cache_dir}/dataset_v${..dataset_version}.json
-  model_name: msmarco-distilbert-base-v4
-  checkpoint: ${sys.cache_dir}/models/${.model_name}/${..model_version}/checkpoints/
-  output: ${sys.cache_dir}/models/${.model_name}/${..model_version}/model/
+  num_epochs: 15
+  warmup_ratio: 0.1
+  seed: 42
+wandb:
+  project_name: fz-search-reranker

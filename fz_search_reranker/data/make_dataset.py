@@ -2,13 +2,14 @@ import json
 import pickle
 from pathlib import Path
 from typing import List
+from dotenv import load_dotenv  # for reading API key from .env file
 
 import hydra
 from datasets import load_dataset
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from omegaconf import DictConfig
-
+from omegaconf import DictConfig, OmegaConf
+from langchain_openai import ChatOpenAI
 
 def save_data(chunks: List[Document], examples: List[Document]):
     with open("data/processed/chunks.pkl", "wb") as f:
@@ -17,12 +18,12 @@ def save_data(chunks: List[Document], examples: List[Document]):
         pickle.dump(examples, f)
 
 
-def load_data():
+def load_data(data_dir: str):
     # Load chunks
-    with open("data/processed/chunks.pkl", "rb") as f:
+    with open(f"{data_dir}/chunks.pkl", "rb") as f:
         chunks = pickle.load(f)
     # Load example queries
-    with open("data/processed/example_queries.pkl", "rb") as f:
+    with open(f"{data_dir}/example_queries.pkl", "rb") as f:
         example_queries = pickle.load(f)
 
     return chunks, example_queries
@@ -110,12 +111,13 @@ def make_batch_requests(
 
 
 def make_requests(
+    model: str,
     chunks: List[Document],
     example_prompt: str,
     system_prompt: str,
     user_prompt_template: str,
-    n_requests: int = 0,
-    file_path: str = "data/processed/api_requests.jsonl",
+    n_requests: int,
+    file_path: str,
 ):
     if n_requests == 0:
         n_requests = len(chunks)
@@ -124,11 +126,11 @@ def make_requests(
     for index, chunk in enumerate(chunks):
         if index < n_requests:
             description = user_prompt_template.format(
-                chunk_title=chunk.metadata["title"], chunk_content=chunk.page_content, user_query=""
+                chunk_title=chunk.metadata["title"], chunk_content=chunk.page_content, user_queries=""
             )
 
             request = {
-                "model": "gpt-3.5-turbo",
+                "model": model,
                 "temperature": 0.1,
                 "messages": [
                     {"role": "system", "content": system_prompt},
@@ -145,31 +147,38 @@ def make_requests(
             f.write("\n")
 
 
-def extract_responses_from_jsonl(chunks, file_path):
-    queries = []
-    with open(file_path, "r") as f:
+def extract_responses_from_jsonl(
+        chunks: List[Document],
+        input_path: str,
+        output_path: str,
+):
+    queries_by_chunk = []
+    with open(input_path, "r") as f:
         for line in f:
             response = json.loads(line)
-            query = response[1]["choices"][0]["message"]["content"]
+            queries = response[1]["choices"][0]["message"]["content"].splitlines()
+            queries = [q.rstrip() for q in queries] # remove space at the end of some lines
             row_id = response[2]["row_id"]
-            queries.append((query, row_id))
-    queries.sort(key=lambda x: x[1])
+            #print(row_id, queries)
+            queries_by_chunk.append((queries, row_id))
 
-    dataset = [{"query": q[0], "chunk": c.page_content} for q, c in zip(queries, chunks)]
+    queries_by_chunk.sort(key=lambda x: x[1])
 
-    data = {"version": "0.0.2", "data": dataset}
+    dataset = [{"queries": q[0], "chunk": c.page_content} for q, c in zip(queries_by_chunk, chunks)]
+
+    data = {"version": "0.0.1", "data": dataset}
 
     # Save dataset as json
-    with open("data/processed/dataset_v0.0.2.json", "w", encoding="utf-8") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
 
 @hydra.main(version_base=None, config_path="../configs", config_name="config")
 def make_dataset(cfg: DictConfig):
-    # print(OmegaConf.to_yaml(cfg))
+    print(OmegaConf.to_yaml(cfg))
 
     if cfg.data.load_from_disk:
-        chunks, examples = load_data()
+        chunks, examples = load_data(cfg.paths.data_dir)
     else:
         chunks = make_chunks(chunk_size=1000, chunk_overlap=100)
         examples = make_example_queries(chunks)
@@ -185,35 +194,52 @@ def make_dataset(cfg: DictConfig):
             chunks_dict[c.metadata["title"]] = c
     chunks = list(chunks_dict.values())
 
-    # example_prompt = cfg.data.user_prompt_template.format(
-    #     chunk_title=examples[0]["chunk_title"],
-    #     chunk_content=examples[0]["chunk_content"],
-    #     user_query=examples[0]["query"],
-    # )
+    example_prompt = cfg.model.prompts.user_prompt_template.format(
+        chunk_title=cfg.model.prompts.example.chunk_title,
+        chunk_content=cfg.model.prompts.example.chunk_content,
+        user_queries=cfg.model.prompts.example.user_queries,
+    )
 
     # make_requests(
+    #     model=cfg.model.model_name,
     #     chunks=chunks,
     #     n_requests=cfg.data.n_requests,
     #     example_prompt=example_prompt,
-    #     system_prompt=cfg.data.system_prompt,
-    #     user_prompt_template=cfg.data.user_prompt_template,
-    #     file_path=Path(f"{cfg.sys.work_dir}/{cfg.data.paths.requests}")
-    #     )
+    #     system_prompt=cfg.model.prompts.system_prompt,
+    #     user_prompt_template=cfg.model.prompts.user_prompt_template,
+    #     file_path=cfg.paths.requests,
+    # )
 
-    extract_responses_from_jsonl(chunks, Path(f"{cfg.sys.work_dir}/{cfg.data.paths.requests_results}"))
+    extract_responses_from_jsonl(
+        chunks,
+        input_path=cfg.paths.requests_results,
+        output_path=cfg.paths.dataset,
+    )
 
-    # num_examples = 5000
+    # load_dotenv()
+
+    # llm = ChatOpenAI(model="gpt-4o-mini")
+
+    # num_examples = 50
     # queries = []
-    # start_time = time.time()
-    # for i in range(num_examples):
-    #     response = llm.invoke(prompt.format(title=chunks[i].metadata['title'], chunk=chunks[i].page_content))
+    # for i,chunk in enumerate(chunks):
+
+    #     if i > num_examples:
+    #         break
+
+    #     description = cfg.model.prompts.user_prompt_template.format(
+    #         chunk_title=chunk.metadata["title"], chunk_content=chunk.page_content, user_queries=""
+    #     )
+    #     request = [
+    #         {"role": "system", "content": f"{cfg.model.prompts.system_prompt}"},
+    #         {"role": "user", "content": example_prompt},
+    #         {"role": "user", "content": description},
+    #     ]
+    #     response = llm.invoke(request)
+    #     #response = llm.invoke(prompt.format(title=chunks[i].metadata['title'], chunk=chunks[i].page_content))
     #     print(response.content)
     #     queries.append(response.content)
 
-    #     print(f"Example {i+1} of {num_examples} completed")
-    #     print(f"Time taken: {time.time() - start_time}")
-
-    # print(f"Total time taken: {time.time() - start_time}")
 
 
 if __name__ == "__main__":

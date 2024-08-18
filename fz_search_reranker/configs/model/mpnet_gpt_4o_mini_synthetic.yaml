@@ -1,0 +1,4 @@
+model_name: retrieval-mpnet-dot-finetuned-gpt-4o-mini-synthetic
+model_dir: ${paths.models_dir}/${.model_name}/model
+embedding_dim: 768
+index_dir: ${paths.index_dir}/${.model_name}.faiss

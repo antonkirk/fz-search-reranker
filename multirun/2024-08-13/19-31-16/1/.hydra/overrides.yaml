@@ -1,0 +1,4 @@
+- sys=titan
+- model=mpnet_base
+- eval/dataset=ada_dx
+- +experiment=eval_whoosh

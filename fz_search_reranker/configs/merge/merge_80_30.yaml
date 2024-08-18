@@ -1,0 +1,16 @@
+models:
+  - model: meta-llama/Meta-Llama-3-8B
+    # No parameters necessary for base model
+  - model: meta-llama/Meta-Llama-3-8B-Instruct
+    parameters:
+      density: 0.53
+      weight: 0.8
+  - model: aaditya/Llama3-OpenBioLLM-8B
+    parameters:
+      density: 0.53
+      weight: 0.3
+merge_method: dare_ties
+base_model: meta-llama/Meta-Llama-3-8B
+parameters:
+  int8_mask: true
+dtype: bfloat16

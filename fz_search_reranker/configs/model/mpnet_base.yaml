@@ -1,0 +1,3 @@
+model_name: multi-qa-mpnet-base-dot-v1
+model_dir: ${.model_name}
+index_dir: ${paths.index_dir}/${.model_name}.faiss

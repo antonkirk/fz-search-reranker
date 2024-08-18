@@ -1,0 +1,3 @@
+- sys=titan
+- model=mpnet_llama3_synthetic
+- eval/dataset=findzebra

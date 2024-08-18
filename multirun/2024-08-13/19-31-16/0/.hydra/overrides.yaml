@@ -1,0 +1,4 @@
+- sys=titan
+- model=mpnet_base
+- eval/dataset=findzebra
+- +experiment=eval_whoosh

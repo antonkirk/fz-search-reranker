@@ -179,3 +179,7 @@ cython_debug/
 models/
 /data/
 outputs/
+*.out
+scratch/
+wandb/
+plots/

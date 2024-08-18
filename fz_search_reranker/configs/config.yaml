@@ -1,4 +1,9 @@
 defaults:
   - data: data
+  - dataset: llama3_openbiollm_synthetic
+  - paths: paths
+  - model: llama3_instruct
+  - prompts: llama3_instruct
+  - sys: titan
   - training: training
-  - sys: local
+  - eval: eval
